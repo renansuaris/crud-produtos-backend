@@ -1,5 +1,7 @@
 package com.renan.demo.service;
 
+import com.renan.demo.dto.ProdutoRequestDTO;
+import com.renan.demo.dto.ProdutoResponseDTO;
 import com.renan.demo.model.Categoria;
 import com.renan.demo.model.Produto;
 import com.renan.demo.repository.ProdutoRepository;
@@ -18,38 +20,46 @@ public class ProdutoService {
     private final CategoriaService categoriaService;
 
     @Transactional
-    public Produto salvar(Produto produto) {
-        Categoria categoria = categoriaService.buscarPorId(produto.getCategoria().getId());
+    public ProdutoResponseDTO salvar(ProdutoRequestDTO dto) {
+        Categoria categoria = categoriaService.buscarPorId(dto.categoriaId());
+        
+        Produto produto = new Produto();
+        produto.setNome(dto.nome());
+        produto.setPreco(dto.preco());
         produto.setCategoria(categoria);
 
-        return produtoRepository.save(produto);
+        return new ProdutoResponseDTO(produtoRepository.save(produto));
     }
 
-    public Page<Produto> listarTodos(Pageable pageable) {
-        return produtoRepository.findAll(pageable);
+    public Page<ProdutoResponseDTO> listarTodos(Pageable pageable) {
+        return produtoRepository.findAll(pageable).map(ProdutoResponseDTO::new);
     }
 
-    public Produto buscarPorId(Long id) {
-        return produtoRepository.findById(id)
+    public ProdutoResponseDTO buscarPorId(Long id) {
+        Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com o ID: " + id));
+        return new ProdutoResponseDTO(produto);
     }
 
     @Transactional
-    public Produto atualizar(Long id, Produto produtoAtualizado) {
-        Produto produtoExistente = buscarPorId(id);
+    public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO dto) {
+        Produto produtoExistente = produtoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com o ID: " + id));
 
-        Categoria categoria = categoriaService.buscarPorId(produtoAtualizado.getCategoria().getId());
+        Categoria categoria = categoriaService.buscarPorId(dto.categoriaId());
 
-        produtoExistente.setNome(produtoAtualizado.getNome());
-        produtoExistente.setPreco(produtoAtualizado.getPreco());
+        produtoExistente.setNome(dto.nome());
+        produtoExistente.setPreco(dto.preco());
         produtoExistente.setCategoria(categoria);
 
-        return produtoRepository.save(produtoExistente);
+        return new ProdutoResponseDTO(produtoRepository.save(produtoExistente));
     }
 
     @Transactional
     public void excluir(Long id) {
-        Produto produto = buscarPorId(id);
-        produtoRepository.delete(produto);
+        if (!produtoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Produto não encontrado com o ID: " + id);
+        }
+        produtoRepository.deleteById(id);
     }
 }

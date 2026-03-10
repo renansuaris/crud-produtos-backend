@@ -1,13 +1,15 @@
 package com.renan.demo.service;
 
+import com.renan.demo.dto.CategoriaDTO;
 import com.renan.demo.model.Categoria;
 import com.renan.demo.repository.CategoriaRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,15 +18,19 @@ public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
 
     @Transactional
-    public Categoria salvar(Categoria categoria) {
-        if (categoriaRepository.existsByNome(categoria.getNome())) {
-            throw new IllegalArgumentException("Já existe uma categoria cadastrada com o nome: " + categoria.getNome());
+    public CategoriaDTO salvar(CategoriaDTO dto) {
+        if (categoriaRepository.existsByNome(dto.nome())) {
+            throw new IllegalArgumentException("Já existe uma categoria cadastrada com o nome: " + dto.nome());
         }
-        return categoriaRepository.save(categoria);
+        Categoria categoria = new Categoria();
+        categoria.setNome(dto.nome());
+        return new CategoriaDTO(categoriaRepository.save(categoria));
     }
 
-    public List<Categoria> listarTodas() {
-        return categoriaRepository.findAll();
+    public List<CategoriaDTO> listarTodas() {
+        return categoriaRepository.findAll().stream()
+                .map(CategoriaDTO::new)
+                .collect(Collectors.toList());
     }
 
     public Categoria buscarPorId(Long id) {
@@ -32,17 +38,21 @@ public class CategoriaService {
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada com o ID: " + id));
     }
 
+    public CategoriaDTO buscarDTO(Long id) {
+        return new CategoriaDTO(buscarPorId(id));
+    }
+
     @Transactional
-    public Categoria atualizar(Long id, Categoria categoriaAtualizada) {
+    public CategoriaDTO atualizar(Long id, CategoriaDTO dto) {
         Categoria categoriaExistente = buscarPorId(id);
 
-        if (!categoriaExistente.getNome().equals(categoriaAtualizada.getNome()) &&
-                categoriaRepository.existsByNome(categoriaAtualizada.getNome())) {
+        if (!categoriaExistente.getNome().equals(dto.nome()) &&
+                categoriaRepository.existsByNome(dto.nome())) {
             throw new IllegalArgumentException("Já existe uma categoria cadastrada com este nome.");
         }
 
-        categoriaExistente.setNome(categoriaAtualizada.getNome());
-        return categoriaRepository.save(categoriaExistente);
+        categoriaExistente.setNome(dto.nome());
+        return new CategoriaDTO(categoriaRepository.save(categoriaExistente));
     }
 
     @Transactional

@@ -1,7 +1,9 @@
 package com.renan.demo.controller;
 
-import com.renan.demo.model.Produto;
+import com.renan.demo.dto.ProdutoRequestDTO;
+import com.renan.demo.dto.ProdutoResponseDTO;
 import com.renan.demo.service.ProdutoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -14,23 +16,29 @@ import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/produtos")
 @RequiredArgsConstructor
+@Tag(name = "Produtos", description = "Endpoints para gerenciamento de produtos")
 public class ProdutoController {
 
     private final ProdutoService service;
 
     @PostMapping
-    public ResponseEntity<Produto> criar(@RequestBody @Valid Produto produto) {
-        Produto produtoSalvo = service.salvar(produto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(produtoSalvo); // Retorna 201 Created
+    public ResponseEntity<ProdutoResponseDTO> criar(@RequestBody @Valid ProdutoRequestDTO produto) {
+        ProdutoResponseDTO produtoSalvo = service.salvar(produto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(produtoSalvo);
     }
 
     @GetMapping
-    public ResponseEntity<Page<Produto>> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
+    public ResponseEntity<Page<ProdutoResponseDTO>> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
         return ResponseEntity.ok(service.listarTodos(pageable));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProdutoResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Produto> atualizar(@PathVariable Long id, @RequestBody @Valid Produto produto) {
+    public ResponseEntity<ProdutoResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid ProdutoRequestDTO produto) {
         return ResponseEntity.ok(service.atualizar(id, produto));
     }
 

@@ -13,7 +13,8 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Produto {
+public class
+Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +31,7 @@ public class Produto {
 
     @NotNull(message = "A categoria é obrigatória.")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria.id", nullable = false)
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
 }

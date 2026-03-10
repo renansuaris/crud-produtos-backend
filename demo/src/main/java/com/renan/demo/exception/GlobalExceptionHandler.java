@@ -1,5 +1,6 @@
 package com.renan.demo.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> tratarErro404() {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<String> tratarErro404(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

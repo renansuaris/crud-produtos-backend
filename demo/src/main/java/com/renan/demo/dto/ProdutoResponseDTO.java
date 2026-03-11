@@ -13,6 +13,6 @@ public record ProdutoResponseDTO(
         this(produto.getId(),
              produto.getNome(),
              produto.getPreco(),
-             new CategoriaDTO(produto.getCategoria()));
+             produto.getCategoria() != null ? new CategoriaDTO(produto.getCategoria()) : null);
     }
 }

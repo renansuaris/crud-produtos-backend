@@ -14,6 +14,5 @@ public record ProdutoRequestDTO(
         @Positive(message = "O preço deve ser maior que zero.")
         BigDecimal preco,
 
-        @NotNull(message = "A categoria é obrigatória.")
         Long categoriaId
 ) {}

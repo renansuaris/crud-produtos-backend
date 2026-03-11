@@ -3,6 +3,7 @@ package com.renan.demo.service;
 import com.renan.demo.dto.CategoriaDTO;
 import com.renan.demo.model.Categoria;
 import com.renan.demo.repository.CategoriaRepository;
+import com.renan.demo.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+    private final ProdutoRepository produtoRepository;
 
     @Transactional
     public CategoriaDTO salvar(CategoriaDTO dto) {
@@ -58,6 +60,7 @@ public class CategoriaService {
     @Transactional
     public void excluir(Long id) {
         Categoria categoria = buscarPorId(id);
+        produtoRepository.desvincularProdutos(id);
         categoriaRepository.delete(categoria);
     }
 

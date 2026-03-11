@@ -21,7 +21,14 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoResponseDTO salvar(ProdutoRequestDTO dto) {
-        Categoria categoria = categoriaService.buscarPorId(dto.categoriaId());
+        if (produtoRepository.existsByNome(dto.nome())) {
+            throw new IllegalArgumentException("Já existe um produto cadastrado com o nome: " + dto.nome());
+        }
+
+        Categoria categoria = null;
+        if (dto.categoriaId() != null) {
+            categoria = categoriaService.buscarPorId(dto.categoriaId());
+        }
         
         Produto produto = new Produto();
         produto.setNome(dto.nome());
@@ -46,7 +53,15 @@ public class ProdutoService {
         Produto produtoExistente = produtoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com o ID: " + id));
 
-        Categoria categoria = categoriaService.buscarPorId(dto.categoriaId());
+        if (!produtoExistente.getNome().equals(dto.nome()) &&
+                produtoRepository.existsByNome(dto.nome())) {
+            throw new IllegalArgumentException("Já existe um produto cadastrado com este nome.");
+        }
+
+        Categoria categoria = null;
+        if (dto.categoriaId() != null) {
+            categoria = categoriaService.buscarPorId(dto.categoriaId());
+        }
 
         produtoExistente.setNome(dto.nome());
         produtoExistente.setPreco(dto.preco());

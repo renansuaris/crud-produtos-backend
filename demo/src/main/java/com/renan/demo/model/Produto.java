@@ -29,9 +29,8 @@ Produto {
     @Positive(message = "O preço deve ser maior que zero.")
     private BigDecimal preco;
 
-    @NotNull(message = "A categoria é obrigatória.")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id", nullable = false)
+    @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
 }

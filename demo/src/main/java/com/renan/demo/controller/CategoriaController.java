@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/categorias")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 @Tag(name = "Categorias", description = "Endpoints para gerenciamento de categorias")
 public class CategoriaController {
 

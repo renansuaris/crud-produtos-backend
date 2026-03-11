@@ -77,4 +77,15 @@ public class ProdutoService {
         }
         produtoRepository.deleteById(id);
     }
+
+    @Transactional
+    public ProdutoResponseDTO atribuirCategoria(Long produtoId, Long categoriaId) {
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com o ID: " + produtoId));
+
+        Categoria categoria = categoriaId != null ? categoriaService.buscarPorId(categoriaId) : null;
+        produto.setCategoria(categoria);
+
+        return new ProdutoResponseDTO(produtoRepository.save(produto));
+    }
 }

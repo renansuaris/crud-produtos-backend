@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/produtos")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 @Tag(name = "Produtos", description = "Endpoints para gerenciamento de produtos")
 public class ProdutoController {
 
@@ -46,6 +47,11 @@ public class ProdutoController {
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         service.excluir(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/categoria/{categoriaId}")
+    public ResponseEntity<ProdutoResponseDTO> atribuirCategoria(@PathVariable Long id, @PathVariable Long categoriaId) {
+        return ResponseEntity.ok(service.atribuirCategoria(id, categoriaId));
     }
 
 }
